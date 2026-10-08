@@ -3,9 +3,16 @@
 #include <iostream>
 #include <limits>
 #include <stdexcept>
+#include <vector>
 
 namespace shirokov
 {
+  struct Circle
+  {
+    size_t r;
+    int x, y;
+  };
+
   size_t stringToSizeT(const char* line);
 }
 
@@ -37,8 +44,31 @@ int main(int argc, char** argv)
     std::cerr << e.what() << '\n';
     return 1;
   }
+
+  // TODO: убрать заглушки
   (void)threads;
   (void)seed;
+
+  std::vector< shirokov::Circle > circles;
+  while (std::cin)
+  {
+    shirokov::Circle c{};
+    int _;
+    long long r = 0;
+    std::cin >> r >> _ >> c.x >> c.y;
+    if (std::cin.fail() && circles.empty())
+    {
+      std::cerr << "Input error" << '\n';
+      return 2;
+    }
+    if (r < 0)
+    {
+      std::cerr << "Negative radius" << '\n';
+      return 2;
+    }
+    c.r = static_cast< size_t >(r);
+    circles.push_back(std::move(c));
+  }
 
   return 0;
 }
