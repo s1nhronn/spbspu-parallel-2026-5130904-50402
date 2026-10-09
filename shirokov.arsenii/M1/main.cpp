@@ -11,14 +11,21 @@ namespace shirokov
 {
   struct Circle
   {
-    size_t r;
-    int x, y;
+    double r, x, y;
+  };
+
+  struct MinMaxes
+  {
+    double minX, maxX;
+    double minY, maxY;
   };
 
   size_t stringToSizeT(const char* line);
-  bool isInside(double x, double y, double r);
-  size_t calc(double r, size_t tests, size_t seed);
-  double area(double r, size_t threads, size_t tests);
+  bool isInside(double x, double y, const Circle& circle);
+  std::pair< size_t, size_t > calc(
+      const std::vector< Circle >& circles, size_t tries, size_t seed, const MinMaxes& minMaxes);
+  std::pair< double, double > area(const std::vector< Circle >& circles, size_t threads, size_t tries, size_t seed);
+  MinMaxes getMinMaxes(const std::vector< Circle >& circles);
 }
 
 int main(int argc, char** argv)
@@ -50,17 +57,12 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  // TODO: убрать заглушки
-  (void)threads;
-  (void)seed;
-
   std::vector< shirokov::Circle > circles;
   while (std::cin)
   {
-    shirokov::Circle c{};
     int _;
-    long long r = 0;
-    std::cin >> r >> _ >> c.x >> c.y;
+    long long r = 0, x = 0, y = 0;
+    std::cin >> r >> _ >> x >> y;
     if (std::cin.fail() && circles.empty())
     {
       std::cerr << "Input error" << '\n';
@@ -71,10 +73,11 @@ int main(int argc, char** argv)
       std::cerr << "Negative radius" << '\n';
       return 2;
     }
-    c.r = static_cast< size_t >(r);
-    circles.push_back(std::move(c));
+    circles.push_back({static_cast< double >(r), static_cast< double >(x), static_cast< double >(y)});
   }
 
+  std::pair< double, double > res = shirokov::area(circles, threads, tries, seed);
+  std::cout << res.first << ' ' << res.second << '\n';
   return 0;
 }
 
@@ -110,48 +113,104 @@ size_t shirokov::stringToSizeT(const char* str)
   return static_cast< size_t >(res);
 }
 
-bool shirokov::isInside(double x, double y, double r)
+bool shirokov::isInside(double x, double y, const Circle& circle)
 {
-  double dx = r - x, dy = r - y;
-  return dx * dx + dy * dy <= r * r;
+  double dx = x - circle.x;
+  double dy = y - circle.y;
+  return dx * dx + dy * dy <= circle.r * circle.r;
 }
 
-size_t shirokov::calc(double r, size_t tests, size_t seed)
+std::pair< size_t, size_t > shirokov::calc(
+    const std::vector< Circle >& circles, size_t tries, size_t seed, const MinMaxes& minMaxes)
 {
   std::default_random_engine engine(seed);
 
-  double minVal = 0, maxVal = 2 * r;
-  std::uniform_real_distribution< double > dist(minVal, maxVal);
+  std::uniform_real_distribution< double > distX(minMaxes.minX, minMaxes.maxX);
+  std::uniform_real_distribution< double > distY(minMaxes.minY, minMaxes.maxY);
 
-  size_t res = 0;
-  for (size_t i = 0; i < tests; ++i)
+  size_t countOfTotalCoverage = 0;
+  size_t countOfIntersection = 0;
+  for (size_t i = 0; i < tries; ++i)
   {
-    double x = dist(engine);
-    double y = dist(engine);
-    if (isInside(x, y, r))
+    double x = distX(engine);
+    double y = distY(engine);
+    bool isInCircle = false;
+    bool isInIntersection = true;
+    for (const Circle& c : circles)
     {
-      ++res;
+      if (isInside(x, y, c))
+      {
+        isInCircle = true;
+      }
+      else
+      {
+        isInIntersection = false;
+      }
+    }
+    if (isInCircle)
+    {
+      ++countOfTotalCoverage;
+    }
+    if (isInIntersection)
+    {
+      ++countOfIntersection;
     }
   }
-  return res;
+  return {countOfTotalCoverage, countOfIntersection};
 }
 
-double shirokov::area(double r, size_t threads, size_t tests)
+std::pair< double, double > shirokov::area(
+    const std::vector< Circle >& circles, size_t threads, size_t tries, size_t seed)
 {
-  std::vector< std::future< size_t > > results;
+  if (!threads)
+  {
+    threads = 1;
+  }
+
+  size_t base = tries / threads;
+  size_t remainder = tries % threads;
+  std::vector< std::future< std::pair< size_t, size_t > > > results;
   results.reserve(threads);
 
+  MinMaxes minMaxes = shirokov::getMinMaxes(circles);
+
   for (size_t i = 0; i < threads; ++i)
   {
-    results.push_back(std::async(std::launch::async, calc, r, tests, i));
+    size_t currTriesCount = base + ((i < remainder) ? 1 : 0);
+    results.push_back(std::async(std::launch::async, calc, circles, currTriesCount, seed + i, minMaxes));
   }
 
-  size_t count = 0;
+  size_t countOfTotalCoverage = 0;
+  size_t countOfIntersection = 0;
   for (size_t i = 0; i < threads; ++i)
   {
-    count += results[i].get();
+    std::pair< size_t, size_t > res = results[i].get();
+    countOfTotalCoverage += res.first;
+    countOfIntersection += res.second;
   }
 
-  return 4 * r * r * static_cast< double >(count) / static_cast< double >(threads * tests);
+  double boxArea = (minMaxes.maxX - minMaxes.minX) * (minMaxes.maxY - minMaxes.minY);
+
+  double totalCoverage = (static_cast< double >(countOfTotalCoverage) / static_cast< double >(tries)) * boxArea;
+  double intersectionArea = (static_cast< double >(countOfIntersection) / static_cast< double >(tries)) * boxArea;
+
+  return {totalCoverage, intersectionArea};
 }
 
+shirokov::MinMaxes shirokov::getMinMaxes(const std::vector< Circle >& circles)
+{
+  double minX = circles[0].x - circles[0].r;
+  double maxX = circles[0].x + circles[0].r;
+  double minY = circles[0].y - circles[0].r;
+  double maxY = circles[0].y + circles[0].r;
+
+  for (const auto& c : circles)
+  {
+    minX = std::min(minX, c.x - c.r);
+    maxX = std::max(maxX, c.x + c.r);
+    minY = std::min(minY, c.y - c.r);
+    maxY = std::max(maxY, c.y + c.r);
+  }
+
+  return {minX, maxX, minY, maxY};
+}
