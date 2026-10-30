@@ -21,8 +21,8 @@ int main()
   cmds["set"] = shirokov::set;
   cmds["show"] = shirokov::show;
   cmds["showset"] = shirokov::showset;
-  // cmds["frame"] = shirokov::frame;
-  // cmds["frameset"] = shirokov::frameset;
+  cmds["frame"] = shirokov::frame;
+  cmds["frameset"] = shirokov::frameset;
   // cmds["spawn"] = shirokov::spawn;
   // cmds["area-on"] = shirokov::area_on;
   // cmds["status"] = shirokov::status;
@@ -38,13 +38,13 @@ int main()
     catch (const std::out_of_range&)
     {
       std::cout << "<UNKNOWN COMMAND>\n";
-      auto to_ignore = std::numeric_limits< std::streamsize >::max();
+      const auto to_ignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(to_ignore, '\n');
     }
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-      auto to_ignore = std::numeric_limits< std::streamsize >::max();
+      const auto to_ignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(to_ignore, '\n');
     }
   }
