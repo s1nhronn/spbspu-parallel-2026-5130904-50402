@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include "../common/ellipse.hpp"
 #include <functional>
 #include <future>
 #include <iomanip>
@@ -13,7 +14,6 @@
 #include <utility>
 #include <vector>
 #include "constants.hpp"
-#include "ellipse.hpp"
 
 namespace shirokov
 {

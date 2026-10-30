@@ -15,6 +15,7 @@ namespace shirokov
   {
     double x, y, hr, vr;
 
+    Ellipse() = default;
     Ellipse(double x, double y, double hr, double vr);
     bool isInside(double px, double py) const noexcept;
     MinMaxes getMinMaxes() const noexcept;
