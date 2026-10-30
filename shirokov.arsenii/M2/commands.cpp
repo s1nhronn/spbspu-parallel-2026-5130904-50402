@@ -2,7 +2,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
-#include "ellipse.hpp"
+#include <ellipse.hpp>
 
 void shirokov::circle(std::istream& in, std::ostream&, ellipse_map& ellipses)
 {
@@ -13,12 +13,29 @@ void shirokov::circle(std::istream& in, std::ostream&, ellipse_map& ellipses)
   {
     throw std::invalid_argument("Circle with this name already exist");
   }
-  if (r < 0)
+  if (r <= 0)
   {
-    throw std::invalid_argument("Radius must not be negative");
+    throw std::invalid_argument("Radius must be positive");
   }
 
   ellipses.insert({name, {x, y, r, r}});
+}
+
+void shirokov::ellipse(std::istream& in, std::ostream&, ellipse_map& ellipses)
+{
+  std::string name;
+  double hr, vr, x, y;
+  in >> name >> hr >> vr >> x >> y;
+  if (ellipses.find(name) != ellipses.end())
+  {
+    throw std::invalid_argument("Circle with this name already exist");
+  }
+  if (hr <= 0 || vr <= 0)
+  {
+    throw std::invalid_argument("Radiuses must be positive");
+  }
+
+  ellipses.insert({name, {x, y, hr, vr}});
 }
 
 void shirokov::show(std::istream& in, std::ostream& out, ellipse_map& ellipses)

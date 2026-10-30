@@ -14,6 +14,7 @@ int main()
   using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::ellipse_map&);
   std::unordered_map< std::string, cmd_t > cmds;
   cmds["circle"] = shirokov::circle;
+  cmds["ellipse"] = shirokov::ellipse;
   // cmds["set"] = shirokov::set;
   cmds["show"] = shirokov::show;
   // cmds["showset"] = shirokov::showset;

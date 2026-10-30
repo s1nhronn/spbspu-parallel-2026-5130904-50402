@@ -4,13 +4,14 @@
 #include <ostream>
 #include <string>
 #include <unordered_map>
-#include "ellipse.hpp"
+#include <ellipse.hpp>
 
 namespace shirokov
 {
   using ellipse_map = std::unordered_map< std::string, Ellipse >;
 
   void circle(std::istream& in, std::ostream&, ellipse_map& ellipses);
+  void ellipse(std::istream&, std::ostream&, ellipse_map&);
   void set(std::istream&, std::ostream&, ellipse_map&);
   void show(std::istream& in, std::ostream& out, ellipse_map& ellipses);
   void showset(std::istream&, std::ostream&, ellipse_map&);
