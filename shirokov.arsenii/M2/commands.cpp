@@ -1,4 +1,6 @@
 #include "commands.hpp"
+#include <cmath>
+#include <limits>
 #include <stdexcept>
 #include "ellipse.hpp"
 
@@ -31,7 +33,7 @@ void shirokov::show(std::istream& in, std::ostream& out, ellipse_map& ellipses)
   const Ellipse& e = ellipses[name];
   out << e.hr << ' ';
 
-  if (e.hr != e.vr)
+  if (std::fabs(e.hr - e.vr) > std::numeric_limits< double >::epsilon())
   {
     out << e.vr << ' ';
   }
