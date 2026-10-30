@@ -3,6 +3,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include <ellipse.hpp>
 #include <functional>
 #include <future>
 #include <iomanip>
@@ -13,7 +14,6 @@
 #include <utility>
 #include <vector>
 #include "constants.hpp"
-#include "ellipse.hpp"
 
 namespace shirokov
 {
@@ -189,10 +189,10 @@ const std::pair< double, double > shirokov::area(
 
   const double box_area = (min_maxes.max_x - min_maxes.min_x) * (min_maxes.max_y - min_maxes.min_y);
 
-  const double total_coverage
-      = (static_cast< double >(count_of_total_coverage) / static_cast< double >(tries)) * box_area;
-  const double intersection_area
-      = (static_cast< double >(count_of_intersection) / static_cast< double >(tries)) * box_area;
+  const double total_coverage =
+      (static_cast< double >(count_of_total_coverage) / static_cast< double >(tries)) * box_area;
+  const double intersection_area =
+      (static_cast< double >(count_of_intersection) / static_cast< double >(tries)) * box_area;
 
   return {total_coverage, intersection_area};
 }

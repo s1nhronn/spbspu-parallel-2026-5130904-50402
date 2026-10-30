@@ -10,25 +10,26 @@
 
 int main()
 {
-  using cmd_t = void (*)(std::istream&, std::ostream&);
+  shirokov::ellipse_map circles;
+  using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::ellipse_map&);
   std::unordered_map< std::string, cmd_t > cmds;
   cmds["circle"] = shirokov::circle;
-  cmds["set"] = shirokov::set;
+  // cmds["set"] = shirokov::set;
   cmds["show"] = shirokov::show;
-  cmds["showset"] = shirokov::showset;
-  cmds["frame"] = shirokov::frame;
-  cmds["frameset"] = shirokov::frameset;
-  cmds["spawn"] = shirokov::spawn;
-  cmds["area-on"] = shirokov::area_on;
-  cmds["status"] = shirokov::status;
-  cmds["wait"] = shirokov::wait;
+  // cmds["showset"] = shirokov::showset;
+  // cmds["frame"] = shirokov::frame;
+  // cmds["frameset"] = shirokov::frameset;
+  // cmds["spawn"] = shirokov::spawn;
+  // cmds["area-on"] = shirokov::area_on;
+  // cmds["status"] = shirokov::status;
+  // cmds["wait"] = shirokov::wait;
 
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout);
+      cmds.at(cmd)(std::cin, std::cout, circles);
     }
     catch (const std::out_of_range&)
     {
