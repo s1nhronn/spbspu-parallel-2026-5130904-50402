@@ -3,7 +3,7 @@
 #include <istream>
 #include <limits>
 #include <stdexcept>
-#include <ellipse.hpp>
+#include "../common/ellipse.hpp"
 
 namespace
 {
@@ -20,13 +20,15 @@ namespace
   }
 }
 
-void shirokov::circle(std::istream& in, std::ostream&, ellipse_map& ellipses, set_map&)
+void shirokov::circle(std::istream& in, std::ostream&, Data& data)
 {
   std::string name;
   double r = 0.0;
   double x = 0.0;
   double y = 0.0;
   in >> name >> r >> x >> y;
+
+  ellipse_map& ellipses = data.ellipses;
 
   if (ellipses.find(name) != ellipses.end())
   {
@@ -40,7 +42,7 @@ void shirokov::circle(std::istream& in, std::ostream&, ellipse_map& ellipses, se
   ellipses.insert({name, {x, y, r, r}});
 }
 
-void shirokov::ellipse(std::istream& in, std::ostream&, ellipse_map& ellipses, set_map&)
+void shirokov::ellipse(std::istream& in, std::ostream&, Data& data)
 {
   std::string name;
   double hr = 0.0;
@@ -48,6 +50,8 @@ void shirokov::ellipse(std::istream& in, std::ostream&, ellipse_map& ellipses, s
   double x = 0.0;
   double y = 0.0;
   in >> name >> hr >> vr >> x >> y;
+
+  ellipse_map& ellipses = data.ellipses;
 
   if (ellipses.find(name) != ellipses.end())
   {
@@ -61,11 +65,14 @@ void shirokov::ellipse(std::istream& in, std::ostream&, ellipse_map& ellipses, s
   ellipses.insert({name, {x, y, hr, vr}});
 }
 
-void shirokov::set(std::istream& in, std::ostream&, ellipse_map& ellipses, set_map& sets)
+void shirokov::set(std::istream& in, std::ostream&, Data& data)
 {
   std::string set_name;
   size_t set_size = 0;
   in >> set_name >> set_size;
+
+  set_map& sets = data.sets;
+  ellipse_map& ellipses = data.ellipses;
 
   if (sets.find(set_name) != sets.end())
   {
@@ -92,10 +99,12 @@ void shirokov::set(std::istream& in, std::ostream&, ellipse_map& ellipses, set_m
   sets.insert({set_name, std::move(s)});
 }
 
-void shirokov::show(std::istream& in, std::ostream& out, ellipse_map& ellipses, set_map&)
+void shirokov::show(std::istream& in, std::ostream& out, Data& data)
 {
   std::string name;
   in >> name;
+
+  ellipse_map& ellipses = data.ellipses;
 
   if (ellipses.find(name) == ellipses.end())
   {
@@ -106,10 +115,12 @@ void shirokov::show(std::istream& in, std::ostream& out, ellipse_map& ellipses, 
   outFigure(out, e);
 }
 
-void shirokov::showset(std::istream& in, std::ostream& out, ellipse_map&, set_map& sets)
+void shirokov::showset(std::istream& in, std::ostream& out, Data& data)
 {
   std::string name;
   in >> name;
+
+  set_map& sets = data.sets;
 
   if (sets.find(name) == sets.end())
   {
@@ -123,10 +134,12 @@ void shirokov::showset(std::istream& in, std::ostream& out, ellipse_map&, set_ma
   }
 }
 
-void shirokov::frame(std::istream& in, std::ostream& out, ellipse_map& ellipses, set_map&)
+void shirokov::frame(std::istream& in, std::ostream& out, Data& data)
 {
   std::string name;
   in >> name;
+
+  ellipse_map& ellipses = data.ellipses;
 
   if (ellipses.find(name) == ellipses.end())
   {
@@ -138,10 +151,12 @@ void shirokov::frame(std::istream& in, std::ostream& out, ellipse_map& ellipses,
   out << '(' << min_maxes.max_x << ' ' << min_maxes.max_y << ')' << '\n';
 }
 
-void shirokov::frameset(std::istream& in, std::ostream& out, ellipse_map&, set_map& sets)
+void shirokov::frameset(std::istream& in, std::ostream& out, Data& data)
 {
   std::string name;
   in >> name;
+
+  set_map& sets = data.sets;
 
   if (sets.find(name) == sets.end())
   {

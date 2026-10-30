@@ -10,10 +10,9 @@
 
 int main()
 {
-  shirokov::ellipse_map circles;
-  shirokov::set_map sets;
+  shirokov::Data data;
 
-  using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::ellipse_map&, shirokov::set_map&);
+  using cmd_t = void (*)(std::istream& in, std::ostream& out, shirokov::Data& data);
   std::unordered_map< std::string, cmd_t > cmds;
 
   cmds["circle"] = shirokov::circle;
@@ -23,19 +22,16 @@ int main()
   cmds["showset"] = shirokov::showset;
   cmds["frame"] = shirokov::frame;
   cmds["frameset"] = shirokov::frameset;
-  // cmds["spawn"] = shirokov::spawn;
-  // cmds["area-on"] = shirokov::area_on;
-  // cmds["status"] = shirokov::status;
-  // cmds["wait"] = shirokov::wait;
 
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout, circles, sets);
+      auto func = cmds.at(cmd);
+      func(std::cin, std::cout, data);
     }
-    catch (const std::out_of_range&)
+    catch (const std::out_of_range& e)
     {
       std::cout << "<UNKNOWN COMMAND>\n";
       const auto to_ignore = std::numeric_limits< std::streamsize >::max();
