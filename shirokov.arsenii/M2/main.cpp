@@ -11,13 +11,16 @@
 int main()
 {
   shirokov::ellipse_map circles;
-  using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::ellipse_map&);
+  shirokov::set_map sets;
+
+  using cmd_t = void (*)(std::istream&, std::ostream&, shirokov::ellipse_map&, shirokov::set_map&);
   std::unordered_map< std::string, cmd_t > cmds;
+
   cmds["circle"] = shirokov::circle;
   cmds["ellipse"] = shirokov::ellipse;
-  // cmds["set"] = shirokov::set;
+  cmds["set"] = shirokov::set;
   cmds["show"] = shirokov::show;
-  // cmds["showset"] = shirokov::showset;
+  cmds["showset"] = shirokov::showset;
   // cmds["frame"] = shirokov::frame;
   // cmds["frameset"] = shirokov::frameset;
   // cmds["spawn"] = shirokov::spawn;
@@ -30,7 +33,7 @@ int main()
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout, circles);
+      cmds.at(cmd)(std::cin, std::cout, circles, sets);
     }
     catch (const std::out_of_range&)
     {
