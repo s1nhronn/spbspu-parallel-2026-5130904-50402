@@ -2,6 +2,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include "../common/ellipse.hpp"
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -9,8 +10,7 @@
 #include <utility>
 #include <vector>
 #include "constants.hpp"
-#include "ellipse.hpp"
-#include "area.hpp"
+#include "../common/area.hpp"
 
 namespace shirokov
 {
